@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float speed;
+    public float speed = 5.0f;
+    public float jumpForce = 5.0f;
+    public bool isJumping;
+    private float horizontalInput;
     private Rigidbody2D body;
     private void Start()
     {
@@ -13,8 +16,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        body.velocity = new Vector2(Input.GetAxis("Horizontal")*speed, body.velocity.y);
-        if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            body.velocity = new Vector2(body.velocity.x, speed);
+        horizontalInput = Input.GetAxis("Horizontal");
+        body.velocity = new Vector2(speed*horizontalInput, body.velocity.y);
+        if(Input.GetKeyDown(KeyCode.Space) && isJumping == false){
+            body.AddForce(new Vector2(body.velocity.x, jumpForce), ForceMode2D.Impulse);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D col){
+        if(col.gameObject.CompareTag("Ground")){
+            isJumping = false;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D col){
+        if(col.gameObject.CompareTag("Ground")){
+            isJumping = true;
+        }
     }
 }
